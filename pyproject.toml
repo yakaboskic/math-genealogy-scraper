@@ -1,0 +1,13 @@
+[project]
+name = "math-genealogy-scraper"
+version = "0.1.0"
+description = "Modified version of the math-genealogy-scraper to scrape the math genealogy project database"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "aiohttp>=3.13.1",
+    "beautifulsoup4>=4.14.2",
+    "ipython>=9.6.0",
+    "pandas>=2.3.3",
+    "tqdm>=4.67.1",
+]

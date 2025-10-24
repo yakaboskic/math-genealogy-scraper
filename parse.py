@@ -25,22 +25,23 @@ def parse(mgp_id, raw_html):
         Parse a raw html string fetched from the web, e.g.
         https://genealogy.math.ndsu.nodak.edu/id.php?id=216676
 
-        return a dict
+        return a tuple (node_dict, edges_list)
 
-        {
+        node_dict = {
             'id': int,
             'name': str,
-            'thesis': str,
             'school': str,
             'country': str,
-            'year': str,
+            'year': int,
             'subject': str,
-            'advisors': [str],
-            'students': [str],
         }
 
-        The string values are None if not found,
-        while advisors and students are the empty list if not found
+        edges_list = [
+            {'advisor_id': int, 'student_id': int},
+            ...
+        ]
+
+        The string values are None if not found
     '''
     parsed_html = BeautifulSoup(raw_html, "html.parser")
     main_content = parsed_html.find(attrs={'id': 'mainContent'})
@@ -70,9 +71,9 @@ def parse(mgp_id, raw_html):
             pass
 
     advisors = []
-    advisor_container = try_find(text=re.compile('Advisor( \d*)?:'), if_found=lambda x: x.parent)
+    advisor_container = try_find(text=re.compile(r'Advisor( \d*)?:'), if_found=lambda x: x.parent)
     if advisor_container:
-        advisor_links = advisor_container.find_all('a', attrs={'href': re.compile('id=\d+')})
+        advisor_links = advisor_container.find_all('a', attrs={'href': re.compile(r'id=\d+')})
         advisors = [link_to_id(a['href']) for a in advisor_links]
 
     students = []
@@ -83,14 +84,31 @@ def parse(mgp_id, raw_html):
         student_links = [tr.find('td').find('a')['href'] for tr in rows]
         students = [link_to_id(s) for s in student_links]
 
-    return {
+    # Create node data (no advisors/students in node)
+    node = {
         'id': mgp_id,
         'name': name,
-        'thesis': thesis_title,
         'school': school,
         'country': country,
         'year': year,
         'subject': subject,
-        'advisors': advisors,
-        'students': students,
     }
+
+    # Create edge data
+    edges = []
+
+    # Add edges for advisors (advisor -> student relationship)
+    for advisor_id in advisors:
+        edges.append({
+            'advisor_id': advisor_id,
+            'student_id': mgp_id,
+        })
+
+    # Add edges for students (this person -> student relationship)
+    for student_id in students:
+        edges.append({
+            'advisor_id': mgp_id,
+            'student_id': student_id,
+        })
+
+    return node, edges
