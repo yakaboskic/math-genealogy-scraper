@@ -1,0 +1,10 @@
+{
+  "timestamp": "20251024_145025",
+  "id_min": 1,
+  "last_valid_id": 30,
+  "total_nodes": 30,
+  "total_edges": 84,
+  "new_records_this_run": 30,
+  "bad_ids": [],
+  "errors_count": 0
+}

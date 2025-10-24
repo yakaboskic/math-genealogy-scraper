@@ -18,10 +18,7 @@ for record in data['nodes']:
         edges.append((advisor, _id))
 
 
-edges = [
-    list(x) for x in sorted(list(set(edges)))
-    if x[0] in nodes and x[1] in nodes
-]
+edges = [list(x) for x in sorted(list(set(edges)))]
 compressed = {
     'nodes': nodes,
     'edges': edges,
